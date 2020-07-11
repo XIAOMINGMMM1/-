@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.wtu.sj.mapper.CommentMapper">
+    <select id="selectByEssayId" parameterType="Integer" resultType="cn.wtu.sj.entity.Comment">
+    SELECT
+    c.commentId,
+    c.essayId,
+    c.content,
+    c.userId,
+    c.createDate,
+    u.userName
+    FROM
+    `comment` AS c
+    LEFT JOIN `user` AS u ON c.userId = u.id
+    where
+     c.essayId=#{essayId,jdbcType=INTEGER}
+
+    ORDER BY
+    c.createDate DESC
+
+    </select>
+
+    <select id="selectByCommentId" parameterType="Integer" resultType="cn.wtu.sj.entity.Comment">
+    SELECT
+    c.commentId,
+    c.essayId,
+    c.content,
+    c.userId,
+    c.createDate,
+    u.userName
+    FROM
+    `comment` AS c
+    LEFT JOIN `user` AS u ON c.userId = u.id
+    where
+     c.commentId=#{commentId,jdbcType=INTEGER}
+
+
+    </select>
+
+    <delete id="deleteByEssayId" parameterType="Integer">
+        delete from `comment`
+        where
+        essayId=#{essayId,jdbcType=INTEGER}
+    </delete>
+
+    <delete id="deleteByCommentId" parameterType="Integer">
+        delete from `comment`
+        where
+        commentId=#{commentId,jdbcType=INTEGER}
+    </delete>
+
+    <insert id="insertOne">
+        <selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="commentId">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO
+        `comment`(
+        essayId,
+        content,
+        userId,
+        createDate
+        )
+        VALUES
+        (#{essayId},#{content},#{userId},#{createDate})
+    </insert>
+</mapper>

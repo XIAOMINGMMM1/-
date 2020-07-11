@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <title>Document</title>
+  <link rel="stylesheet" type="text/css" href="/res/layui/css/layui.css">
+  <link rel="stylesheet" type="text/css" href="/res/css/main.css">
+<!--加载meta IE兼容文件-->
+<!--[if lt IE 9]>
+<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+<script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+<![endif]-->
+</head>
+<body>
+<div class="header">
+    <div class="menu-btn">
+        <div class="menu"></div>
+    </div>
+    <h1 class="logo">
+        <a>
+            <span>校园交流平台</span>
+            <img width="80px" height="80px" src="/res/img/wtuLogo.jpg">
+        </a>
+    </h1>
+    <div class="nav">
+        <a href="/public/index.html">首页</a>
+        <a href="/public/all_home.html">主页</a>
+        <a th:if="${user.userName != null }" href="/ordinary/publish.html">发表文章</a>
+
+        <a th:if="${visitUser.userName == user.userName}" class="active" th:href="'/public/about.html?visitUserName='+${user.userName}">我的个人中心</a>
+        <a th:if="${visitUser.userName  != user.userName }" class="active" th:href="'/public/about.html?visitUserName='+${user.userName}">他的个人中心</a>
+
+        <a th:if="${user.userName != null }" onclick="linkSuggest()">意见箱   <span class="layui-badge">[[${suggestCount}]]</span></a>
+    </div>
+    <p th:if="${user.userName == null }" class="welcome-text">
+        欢迎来到<span class="name">wtu校园交流平台</span> <span><a style="color: seagreen" href="/public/login.html">请登陆</a></span>
+    </p>
+    <p th:if="${user.userName != null }" class="welcome-text">
+        欢迎 <span><a style="color: seagreen" th:href="'/public/about.html?visitUserName='+${user.userName}">[[${user.userName}]]</a></span> 来到wtu校园交流平台！ <span><a style="color: seagreen" href="/logout">退出</a></span>
+    </p>
+
+</div>
+<!--<div style="text-align: center">-->
+<!--    <img src="/img/catFace.png" class="round_icon" style="height: 100px;width: 100px" alt="">-->
+<!--</div>-->
+
+
+  <div class="about-content">
+
+      <div style="padding: 20px; background-color: #F2F2F2;">
+          <table border="0" align="center" style="text-align:center">
+              <th width="300px" style="text-align: center;"><a th:href="'/public/essay.html?visitUserName='+${visitUser.userName}">文章   <span class="layui-badge">[[${essayCount}]]</span></a></th>
+              <th width="300px" style="text-align: center;"><a th:href="'/public/follow.html?visitUserName='+${visitUser.userName}">关注   <span class="layui-badge">[[${followCount}]]</span></a></th>
+              <th width="300px" style="text-align: center;"><a th:href="'/public/follower.html?visitUserName='+${visitUser.userName}">粉丝   <span class="layui-badge">[[${followCount}]]</span></a></th>
+          </table>
+      </div>
+
+    <div class="w1000">
+        <div th:if="${user.userName != null }">
+            <button type="button" th:if="${followFlag == false}" th:onclick="|save(${visitUser.id})|" style="float: right" class="layui-btn layui-btn-primary layui-btn-sm"><i class="layui-icon"></i></button>
+            <button type="button" th:if="${followFlag == true}" th:onclick="|del(${visitUser.id})|" style="float: right" class="layui-btn layui-btn-sm"><i class="layui-icon"></i></button>
+        </div>
+      <div class="item info">
+        <div class="title">
+          <h3>我的介绍</h3>
+        </div>
+          <div style="text-align: center">
+              <img src="/img/catFace.png" class="round_icon" style="height: 100px;width: 100px" alt="">
+          </div>
+        <div class="cont">
+<!--          <img src="/res/img/xc_img1.jpg">-->
+          <div class="per-info" style="text-align: center">
+            <p>
+              <span class="name">昵 称 : [[${visitUser.nickname}]]</span><br />
+              <span class="age">电 话 : [[${visitUser.phone}]]</span><br />
+              <span class="Career">邮 箱 : [[${visitUser.email}]]</span><br />
+              <span class="interest">简 介 : [[${visitUser.intro}]]</span>
+            </p>
+
+
+          </div>
+        </div>
+
+          <div style="text-align: right">
+              <span class="data" th:if="${user.id} == ${visitUser.id}"><a th:onclick="updateUserInfo()">编辑资料</a></span>
+          </div>
+
+      </div>
+
+    </div>
+  </div>
+
+
+  <div class="content whisper-content leacots-content">
+      <div class="cont w1000">
+          <div class="whisper-list">
+              <div class="item-box">
+                  <div class="review-version">
+                      <div class="form-box">
+                          <img class="banner-img" src="../res/img/liuyan.jpg">
+                          <div class="form">
+<!--                              <form class="layui-form">-->
+                                  <div class="layui-form-item layui-form-text">
+                                      <div class="layui-input-block">
+                                          <textarea name="leaveDesc" id="leaveDesc" placeholder="既然来了，就说几句" class="layui-textarea"></textarea>
+                                      </div>
+                                  </div>
+                                  <div class="layui-form-item">
+                                      <div class="layui-input-block" style="text-align: right;">
+                                          <button class="layui-btn definite" th:onclick="publishLeave()">确定</button>
+                                      </div>
+                                  </div>
+<!--                              </form>-->
+                          </div>
+                      </div>
+                      <div class="volume">
+                          全部留言 <span>10</span>
+                      </div>
+                      <div class="list-cont">
+
+                          <div class="cont" th:each="leave,leaveStat : ${leavePageInfo.list}">
+                              <div class="img">
+                                  <img src="/res/img/header.png" alt="">
+                              </div>
+                              <div class="text">
+                                  <p class="tit"><span class="name"><a th:href="'/public/about.html?visitUserName='+${leave.userName}">[[${leave.userName}]]</a></span><span class="data">[[${leave.createTimeMeaning}]]</span></p>
+                                  <p class="ct">[[${leave.leaveMessage}]]</p>
+                                  <span class="data" th:if="${user.id} == ${visitUser.id}"><a th:onclick="|deleteLeave('${leave.leaveId}')|">删除</a></span>
+                              </div>
+                          </div>
+
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <div id="demo" style="text-align: center;"></div>
+      </div>
+  </div>
+  
+
+
+  <script type="text/javascript" src="/res/layui/layui.js"></script>
+<!--  <script type="text/javascript">-->
+<!--    layui.config({-->
+<!--      base: '/res/js/util/'-->
+<!--    }).use(['element','laypage','form','layer','menu'],function(){-->
+<!--      element = layui.element,laypage = layui.laypage,form = layui.form,layer = layui.layer,menu = layui.menu;-->
+<!--      menu.init();-->
+<!--    })-->
+<!--  </script>-->
+  <script type="text/javascript" src="/js/jquery.min.js"></script>
+  <script type="text/javascript" src="/js/jquery.cookie.js"></script>
+  <script type="text/javascript" src="/js/jquery.base64.js"></script>
+
+  <script th:inline="javascript">
+
+      function publishLeave() {
+          var leave = {};
+          var userId = [[${visitUser.id}]];
+          var leaveMessage = $("#leaveDesc").val();
+          leave["userId"] = userId;
+          leave["leaveMessage"] = leaveMessage;
+          var url = window.location.href;
+          url = $.base64.encode(url);
+          $.ajax({
+              url: "/ordinary/leave/publish-leave",
+              type: "POST",
+              async : false,
+              dataType:"json",
+              contentType : 'application/json',
+              data: JSON.stringify(leave),
+              success: function (data) {
+                  //window.open("/public/home.html");
+                  alert("发布成功");
+                  location.reload(true);
+              },
+              error: function (e) {
+                  //没有登入
+
+                  var status = e.status;
+                  if (status){
+                      $.cookie("redirectUrl",url, {expires: 7, path: '/'});
+                      window.open("/public/login.html?redirectUrl="+window.location.href);
+                  }
+
+              }
+          });
+      }
+
+      function deleteLeave(leaveId) {
+          $.ajax({
+              url: "/ordinary/leave/delete-leave?leaveId="+leaveId,
+              type: "GET",
+              async : false,
+              success: function (data) {
+                 debugger;
+                 location.reload(true);
+              },
+              error: function (e) {
+
+              }
+          });
+      }
+  </script>
+
+  <div class="page" id="Page1"></div>
+  <link type="text/css" href="/css/style.css" rel="stylesheet" />
+  <script type="text/javascript" src="/js/MyPage.js"></script>
+  <script th:inline="javascript">
+      var flag = false;
+      var leaveTotal= [[${leavePageInfo.total}]]+'';
+      var leavePageNum = [[${leavePageInfo.pageNum}]]+'';
+      var leavePageSize = [[${leavePageInfo.pageSize}]]+'';
+      debugger;
+      debugger;
+      P.initMathod({
+          params: {elemId: '#Page1',total:leaveTotal,pageSize:'10',pageIndex:leavePageNum},
+          requestFunction: function () {
+
+              console.log(JSON.stringify(P.config));
+              if (flag){
+                  window.location.href = "/public/about.html?pageNum="+P.config.pageIndex+"&visitUserName="+[[${visitUser.userName}]];
+
+              }
+              flag = true;
+          }
+      });
+
+  </script>
+
+<script>
+    function updateUserInfo() {
+        window.open("/ordinary/modif_details.html?redirectUrl="+window.location.href);
+    }
+
+    function linkSuggest() {
+        window.open("/ordinary/suggest.html");
+    }
+</script>
+
+<script th:inline="javascript">
+    function save() {
+        var follow ={};
+        follow["userId"] = [[${user.id}]];
+        follow["followUserId"] = [[${visitUser.id}]];
+        $.ajax({
+            url: "/ordinary/follow/save",
+            type: "POST",
+            async : false,
+            dataType:"json",
+            contentType : 'application/json',
+            data: JSON.stringify(follow),
+            success: function (data) {
+                location.reload(true);
+            },
+            error: function (e) {
+            }
+        });
+    }
+
+    function del() {
+        var follow ={};
+        follow["userId"] = [[${user.id}]];
+        follow["followUserId"] = [[${visitUser.id}]];
+        $.ajax({
+            url: "/ordinary/follow/delete",
+            type: "POST",
+            async : false,
+            dataType:"json",
+            contentType : 'application/json',
+            data: JSON.stringify(follow),
+            success: function (data) {
+                location.reload(true);
+            },
+            error: function (e) {
+            }
+        });
+    }
+</script>
+</body>
+</html>

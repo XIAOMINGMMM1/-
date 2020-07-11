@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <title>Document</title>
+  <link rel="stylesheet" type="text/css" href="/res/layui/css/layui.css">
+  <link rel="stylesheet" type="text/css" href="/res/css/main.css">
+</head>
+<body>
+  <div class="header">
+    <div class="menu-btn">
+      <div class="menu"></div>
+    </div>
+    <h1 class="logo">
+      <a href="index.html">
+        <span>MYBLOG</span>
+        <img src="/res/img/logo.png">
+      </a>
+    </h1>
+    <div class="nav">
+      <a href="index.html">文章</a>
+      <a href="whisper.html"  class="active">微语</a>
+      <a href="leacots.html">留言</a>
+      <a href="album.html">相册</a>
+      <a href="about.html">关于</a>
+    </div>
+    <ul class="layui-nav header-down-nav">
+      <li class="layui-nav-item"><a href="index.html">文章</a></li>
+      <li class="layui-nav-item"><a href="whisper.html"  class="active">微语</a></li>
+      <li class="layui-nav-item"><a href="leacots.html">留言</a></li>
+      <li class="layui-nav-item"><a href="album.html">相册</a></li>
+      <li class="layui-nav-item"><a href="about.html">关于</a></li>
+    </ul>
+    <p class="welcome-text">
+      欢迎来到<span class="name">小明</span>的博客~
+    </p>
+  </div>
+
+
+  <div class="content whisper-content">
+    <div class="cont">
+      <div class="whisper-list">
+
+
+
+
+         <div class="item-box">
+          <div>
+
+
+
+        <div class="item-box" th:each="essay,essayStat : ${essayDTOPageInfo.list}">
+          <div class="item">
+            <div class="whisper-title">
+              <i class="layui-icon layui-icon-date"></i><span class="hour">12:25</span><span class="date">2018/06/08</span>
+            </div>
+            <p class="text-cont">
+                [[${essay.content}]]
+            </p>
+            <div class="img-box">
+
+                    <img th:each="image,imageStat : ${essay.images}" th:src="${image}" th:width="300px" th:height="200px">
+
+            </div>
+            <div class="op-list">
+              <p class="like"><i class="layui-icon layui-icon-praise"></i><span>1200</span></p>
+              <p class="edit"><i class="layui-icon layui-icon-reply-fill"></i><span>1200</span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="demo" style="text-align: center;"></div>
+    </div>
+
+<!--  <script type="text/html" id="laytplCont">-->
+<!--    <div class="cont">-->
+<!--      <div class="img">-->
+<!--        <img src="{{d.avatar}}" alt="">-->
+<!--      </div>-->
+<!--      <div class="text">-->
+<!--        <p class="tit"><span class="name">{{d.name}}</span><span class="data">2018/06/06</span></p>-->
+<!--        <p class="ct">{{d.cont}}</p>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </script>-->
+<!--  <script type="text/javascript" src="/res/layui/layui.js"></script>-->
+      </div>
+    </div>
+  </div>
+
+  <div class="page" id="Page"></div>
+  <link type="text/css" href="/css/style.css" rel="stylesheet" />
+  <script type="text/javascript" src="/js/MyPage.js"></script>
+  <script type="text/javascript" src="/js/jquery.min.js"></script>
+  <script type="text/javascript">
+      var flag = false;
+      // var total1= [[${essayDTOPageInfo.total}]];
+      // var pageSize1 = [[${essayDTOPageInfo.pageSize}]];
+      // var pageIndex1 = [[${essayDTOPageInfo.pageIndex}]];
+
+      P.initMathod({
+          params: {elemId: '#Page',total:'100',pageSize:'20',pageIndex:'1'},
+          requestFunction: function () {
+              // P.config.total = parseInt(Math.random() * 10 + 85);//此处模拟总记录变化
+
+              //TODO ajax异步请求过程,异步获取到的数据总条数赋值给 P.config.total
+
+              //列表渲染自行处理
+
+              console.log(JSON.stringify(P.config));
+              if (flag){
+                 // window.location.href = "/public/home.html?pageNum="+P.config.pageIndex+"&visitUserName="+[[${visitUser.userName}]];
+                  // $.ajax({
+                  //     url: "/public/home.html?pageNum="+P.config.pageIndex,
+                  //     type: "GET",
+                  //     async : false,
+                  //     success: function (data) {
+                  //         location.reload(true);
+                  //     },
+                  //     error: function (e) {
+                  //
+                  //     }
+                  // });
+              }
+              flag = true;
+          }
+      });
+  </script>
+ </body>
+
+</html>

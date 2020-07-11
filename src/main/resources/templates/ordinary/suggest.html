@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>意见箱</title>
+    <link rel="stylesheet" type="text/css" href="/res/layui/css/layui.css">
+    <link rel="stylesheet" type="text/css" href="/res/css/main.css">
+</head>
+<body>
+
+<div class="header">
+    <div class="menu-btn">
+        <div class="menu"></div>
+    </div>
+    <h1 class="logo">
+        <a>
+            <span>校园交流平台</span>
+            <img width="80px" height="80px" src="/res/img/wtuLogo.jpg">
+        </a>
+    </h1>
+    <div class="nav">
+        <a class="active">首页</a>
+        <a href="/public/all_home.html">主页</a>
+        <a th:if="${user.userName != null }" href="/ordinary/publish.html">发表文章</a>
+        <!--  登陆的情况下才显示    -->
+        <a th:if="${user.userName != null }" th:href="'/public/about.html?visitUserName='+${user.userName}">我的个人中心</a>
+        <a th:if="${user.userName != null }" class="active" onclick="linkSuggest()">意见箱   <span class="layui-badge">[[${suggestCount}]]</span></a>
+    </div>
+    <p th:if="${user.userName == null }" class="welcome-text">
+        欢迎来到<span class="name">wtu校园交流平台</span> <span><a style="color: seagreen" href="/public/login.html">请登陆</a></span>
+    </p>
+    <p th:if="${user.userName != null }" class="welcome-text">
+        欢迎 <span><a style="color: seagreen" th:href="'/public/about.html?visitUserName='+${user.userName}">[[${user.userName}]]</a></span> 来到wtu校园交流平台！ <span><a style="color: seagreen" href="/logout">退出</a></span>
+    </p>
+
+</div>
+
+<div class="content whisper-content leacots-content">
+    <div class="cont w1000">
+        <div class="whisper-list">
+            <div class="item-box">
+                <div class="review-version">
+                    <div class="form-box">
+                        <img class="banner-img" src="../res/img/liuyan.jpg">
+                        <div class="form">
+                            <div class="layui-form-item layui-form-text">
+                                <div class="layui-input-block">
+                                    <textarea name="suggestContent" id="suggestContent" placeholder="发表你的意见吧，我们会根据你提供的意见完善我们的系统！" class="layui-textarea"></textarea>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-input-block" style="text-align: right;">
+                                    <button onclick="saveSuggest()" class="layui-btn definite">确定</button>
+                                </div>
+                            </div>
+                            <!--                              </form>-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="padding: 20px; background-color: #F2F2F2;" th:each="suggest,suggestStat : ${suggestPageInfo.list}">
+            <div class="layui-row layui-col-space15">
+                <div class="layui-col-md12">
+                    <div class="layui-card">
+                        <div class="layui-card-header">
+                            <button type="button" style="float: right" th:if="${suggest.status} =='1'" th:onclick="|updateTwo(${suggest.suggestId})|" class="layui-btn layui-btn-sm layui-btn-normal">收到</button>
+                            <button type="button" style="float: right" th:if="${suggest.status} =='0'" class="layui-btn layui-btn-sm layui-btn-normal layui-btn-disabled">待回复</button>
+                            <button type="button" style="float: right" th:if="${suggest.status} =='2'" class="layui-btn layui-btn-sm layui-btn-normal layui-btn-disabled">回复已查看</button>
+                        </div>
+                        <div class="layui-card-header">意见：[[${suggest.content}]]</div>
+                        <div class="layui-card-body">
+                            回复：[[${suggest.reply}]]
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+
+
+</div>
+<script src="/res/layui/layui.all.js"></script>
+<div class="page" id="Page1"></div>
+<link type="text/css" href="/css/style.css" rel="stylesheet"/>
+<script type="text/javascript" src="/js/MyPage.js"></script>
+<script type="text/javascript" src="/js/jquery.min.js"></script>
+<script th:inline="javascript">
+    var flag = false;
+    var suggestTotal = [[${suggestPageInfo.total}]] + '';
+    var suggestPageNum = [[${suggestPageInfo.pageNum}]] + '';
+    debugger;
+    P.initMathod({
+        params: {elemId: '#Page1', total: suggestTotal, pageSize: '10', pageIndex: suggestPageNum},
+        requestFunction: function () {
+
+            console.log(JSON.stringify(P.config));
+            if (flag) {
+                window.location.href = "/ordinary/suggest.html?pageNum=" + P.config.pageIndex;
+
+            }
+            flag = true;
+        }
+    });
+</script>
+<script>
+    function saveSuggest() {
+        var suggest = {};
+        var content = $("#suggestContent").val();
+        suggest["content"] = content;
+        var layer = layui.layer;
+        layer.confirm("确定提交此意见吗?", {
+            btn: ['确定', '取消'] //可以无限个按钮
+        },function (index, layero) {
+            $.ajax({
+                url: "/ordinary/suggest/save",
+                type: "POST",
+                async : false,
+                dataType:"json",
+                contentType : 'application/json',
+                data: JSON.stringify(suggest),
+                success: function (data) {
+                    var layer = layui.layer;
+                    layer.alert("提交成功，感谢您的意见！");
+                    location.reload();
+                },
+                error: function (e) {
+
+                }
+            });
+
+        }, function (index) {
+        });
+
+    }
+
+    function updateTwo(suggestId) {
+        $.ajax({
+            url: "/ordinary/suggest/reply-two?suggestId="+suggestId,
+            type: "GET",
+            async : false,
+            success: function (data) {
+                location.reload();
+            },
+            error: function (e) {
+
+            }
+        });
+    }
+
+</script>
+
+</body>
+</html>

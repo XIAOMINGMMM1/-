@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.wtu.sj.mapper.FollowMapper">
+    <insert id="save" parameterType="cn.wtu.sj.entity.Follow">
+        <selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="followId">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO
+        `follow`(
+        userId,
+        followUserId)
+        VALUES
+        (#{userId,jdbcType=INTEGER},#{followUserId,jdbcType=INTEGER})
+
+    </insert>
+
+    <delete id="deleteByUser" parameterType="Integer">
+        delete from `follow`
+        where
+        userId=#{userId,jdbcType=INTEGER}
+        and
+        followUserId=#{followUserId,jdbcType=INTEGER}
+    </delete>
+    <delete id="deleteById" parameterType="Integer">
+        delete from `follow`
+        where
+        followId=#{followId,jdbcType=INTEGER}
+
+    </delete>
+    <select id="selectFollowCount" parameterType="Integer" resultType="Integer">
+        select
+        count(1)
+        from
+        `follow`
+        where
+        userId=#{userId,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectFollowerCount" parameterType="Integer" resultType="Integer">
+        select
+        count(1)
+        from
+        `follow`
+        where
+        followUserId=#{followUserId,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectAllFollow" parameterType="Integer" resultType="cn.wtu.sj.api.dto.FollowDTO">
+        select
+        f.followId,
+        f.userId,
+        f.followUserId,
+        u.userName,
+        ui.intro
+        from
+        `follow` as f
+        left join `user` as u on f.userId = u.id
+        left join `user_info` as ui on ui.userId = u.id
+        where
+        f.userId = #{userId,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectAllFollower" parameterType="Integer" resultType="cn.wtu.sj.api.dto.FollowDTO">
+        select
+        f.followId,
+        f.userId,
+        f.followUserId,
+        u.userName,
+        ui.intro
+        from
+        `follow` as f
+        left join `user` as u on f.followUserId = u.id
+        left join `user_info` as ui on ui.userId = u.id
+        where
+        f.followUserId = #{followUserId,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectByUser" parameterType="cn.wtu.sj.entity.Follow" resultType="Integer">
+        select
+        count(1)
+        from `follow`
+        where
+        userId=#{userId,jdbcType=INTEGER}
+        and
+        followUserId = #{followUserId,jdbcType=INTEGER}
+    </select>
+</mapper>

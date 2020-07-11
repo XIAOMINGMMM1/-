@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.wtu.sj.mapper.UserInfoMapper">
+
+
+
+    <insert id="save" parameterType="cn.wtu.sj.entity.UserInfo">
+
+        INSERT INTO
+        `user_info`(
+        userId,
+        nickname,
+        headPortrait,
+        phone,
+        email,
+        intro,
+        attention,
+        fans
+        )
+        VALUES
+        (#{userId},#{nickname},#{headPortrait},#{phone},#{email},#{intro},#{attention},#{fans})
+    </insert>
+
+    <update id="update" parameterType="cn.wtu.sj.entity.UserInfo">
+        UPDATE
+        `user_info` u
+        SET
+        u.email = #{email},
+        u.nickname = #{nickname},
+        u.phone = #{phone},
+        u.intro = #{intro}
+        WHERE  u.userId= #{userId,jdbcType=INTEGER}
+    </update>
+
+
+</mapper>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>修改详情</title>
+
+
+    <link rel="stylesheet" href="/register/css/style.css">
+
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h2>修改详情</h2>
+    </div>
+    <div style="text-align: center">
+        <img src="/img/catFace.png" class="round_icon" style="height: 100px;width: 100px" alt="">
+    </div>
+    <form id="form" class="form">
+        <div class="form-control">
+            <label for="username">用户:[[${user.userName}]]</label>
+        </div>
+        <div class="form-control">
+            <label for="username">昵称</label>
+            <input type="text" placeholder="昵称" id="username"/>
+            <i class="fas fa-check-circle"></i>
+            <i class="fas fa-exclamation-circle"></i>
+            <small>Error message</small>
+        </div>
+        <div class="form-control">
+            <label for="username">邮箱</label>
+            <input type="email" placeholder="请输有效入邮箱" id="email" />
+            <i class="fas fa-check-circle"></i>
+            <i class="fas fa-exclamation-circle"></i>
+            <small>Error message</small>
+        </div>
+        <div class="form-control">
+            <label for="username">电话</label>
+            <input type="text" placeholder="电话" id="phone" />
+            <i class="fas fa-check-circle"></i>
+            <i class="fas fa-exclamation-circle"></i>
+            <small>Error message</small>
+        </div>
+        <div class="form-control">
+            <label for="username">简介</label>
+            <input type="text" placeholder="简介" id="intro" />
+            <i class="fas fa-check-circle"></i>
+            <i class="fas fa-exclamation-circle"></i>
+            <small>Error message</small>
+        </div>
+        <button>提交</button>
+    </form>
+</div>
+<script type="text/javascript" src="/js/jquery.min.js"></script>
+<script src="/register/js/script1.js"></script>
+<script th:inline="javascript">
+    $("#username").attr("value",[[${user.nickname}]]);
+    $("#email").attr("value",[[${user.email}]]);
+    $("#phone").attr("value",[[${user.phone}]]);
+    $("#intro").attr("value",[[${user.intro}]]);
+</script>
+
+</body>
+</html>

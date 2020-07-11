@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>首页</title>
+    <link rel="stylesheet" type="text/css" href="/res/layui/css/layui.css">
+    <link rel="stylesheet" type="text/css" href="/res/css/main.css">
+    <!--加载meta IE兼容文件-->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div class="header">
+    <div class="menu-btn">
+        <div class="menu"></div>
+    </div>
+    <h1 class="logo">
+        <a>
+            <span>校园交流平台</span>
+            <img width="80px" height="80px" src="/res/img/wtuLogo.jpg">
+        </a>
+    </h1>
+    <div class="nav">
+        <a class="active">首页</a>
+        <a href="/public/all_home.html">主页</a>
+        <a th:if="${user.userName != null }" href="/ordinary/publish.html">发表文章</a>
+        <!--  登陆的情况下才显示    -->
+        <a th:if="${user.userName != null }" th:href="'/public/about.html?visitUserName='+${user.userName}">我的个人中心</a>
+        <a th:if="${user.userName != null }" onclick="linkSuggest()">意见箱   <span class="layui-badge">[[${suggestCount}]]</span></a>
+    </div>
+    <p th:if="${user.userName == null }" class="welcome-text">
+        欢迎来到<span class="name">wtu校园交流平台</span> <span><a style="color: seagreen" href="/public/login.html">请登陆</a></span>
+    </p>
+    <p th:if="${user.userName != null }" class="welcome-text">
+        欢迎 <span><a style="color: seagreen" th:href="'/public/about.html?visitUserName='+${user.userName}">[[${user.userName}]]</a></span> 来到wtu校园交流平台！ <span><a style="color: seagreen" href="/logout">退出</a></span>
+    </p>
+
+</div>
+
+<div class="banner">
+        <div class="title" style="left: 300px">
+            <h3>WTU<br/>校园交流平台</h3>
+            <h4>欢迎大家来沟通</h4>
+        </div>
+        <div class="amount" style="right: 300px">
+<!--            <p><span class="text">访问量</span><span class="access">1000</span></p>-->
+<!--            <p><span class="text">日志</span><span class="daily-record">1000</span></p>-->
+        </div>
+    </div>
+</div>
+
+<div class="content">
+    <div class="cont w1000">
+        <div class="title">
+        <span class="layui-breadcrumb" lay-separator="|">
+          <a href="javascript:;" class="active">学校通知</a>
+        </span>
+        </div>
+        <div class="list-item">
+            <div class="item" th:each="notice,noticeStat : ${noticeList}">
+                <div class="layui-fluid">
+                    <div class="layui-row">
+                        <div class="layui-col-xs12 layui-col-sm4 layui-col-md5">
+                            <div class="img" th:if="${notice.images} == ''"><img src="/res/img/system_01.jpg" style="width: 420px;height: 280px;" alt=""></div>
+                            <div class="img" th:if="${notice.images} != ''"><img th:src="${notice.images}" style="width: 420px;height: 280px;" alt=""></div>
+                        </div>
+                        <div class="layui-col-xs12 layui-col-sm8 layui-col-md7">
+                                <div class="item-cont">
+                                <h3>重要通知！重要通知！重要通知！
+                                    <button class="layui-btn layui-btn-danger new-icon">hot</button>
+                                </h3>
+                                <h5>公告标题</h5>
+                                <p>
+                                   [[${notice.title}]]</p>
+                                <a th:onclick="|visitNotice(${notice.noticeId})|" class="go-icon"></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="demo" style="text-align: center;"></div>
+    </div>
+</div>
+
+<script type="text/javascript" src="/res/layui/layui.js"></script>
+<script th:inline="javascript">
+    function visitNotice(noticeId) {
+        window.open("/public/visit_notice.html?noticeId="+noticeId);
+    }
+
+    function linkSuggest() {
+        window.open("/ordinary/suggest.html");
+    }
+</script>
+</body>
+</html>

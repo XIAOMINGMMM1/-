@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>账号管理</title>
+    <link rel="stylesheet" href="/res/admin/layui/css/layui.css" media="all">
+</head>
+<body>
+<div class="layui-tab" style="margin: 0;">
+    <ul class="layui-tab-title">
+        <li><a href="/admin/suggest_list.html">意见列表</a></li>
+        <li class="layui-this">文章详情</li>
+    </ul>
+</div>
+
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+    <legend>意见详情</legend>
+</fieldset>
+
+<div style="padding: 20px; background-color: #F2F2F2;">
+    <form class="layui-form" action="">
+
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">意见id</label>
+                <div class="layui-input-inline">
+                    <input type="tel" disabled="disabled" name="suggestId" lay-verify="title" autocomplete="off"
+                           th:value="${suggest.suggestId}" class="layui-input">
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">用户名</label>
+                <div class="layui-input-inline">
+                    <input type="tel" disabled="disabled" name="userName" lay-verify="title" autocomplete="off"
+                           th:value="${suggest.userName}" class="layui-input">
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">真实名称</label>
+                <div class="layui-input-inline">
+                    <input type="tel" disabled="disabled" name="realName" lay-verify="title" autocomplete="off"
+                           th:value="${suggest.realName}" class="layui-input">
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">电话</label>
+                <div class="layui-input-inline">
+                    <input type="tel" disabled="disabled" name="phone" lay-verify="title" autocomplete="off"
+                           th:value="${suggest.phone}" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">邮箱</label>
+                <div class="layui-input-inline">
+                    <input type="tel" disabled="disabled" name="email" lay-verify="title" autocomplete="off"
+                           th:value="${suggest.email}" class="layui-input">
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">状态</label>
+                <div class="layui-input-inline">
+                    <select id="status-like" disabled="disabled" name="statusLike" lay-verify="required">
+                        <option value="" th:if="${suggest.status} == '0'">未处理</option>
+                        <option value="" th:if="${suggest.status} == '1'">已回复</option>
+                        <option value="" th:if="${suggest.status} == '2'">回复已收到</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">意见</label>
+            <div class="layui-input-block">
+                <textarea  disabled="disabled" class="layui-textarea">[[${suggest.content}]]</textarea>
+            </div>
+        </div>
+
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">回复</label>
+            <div class="layui-input-block">
+                <textarea class="layui-textarea" disabled="disabled">[[${suggest.reply}]]</textarea>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+<div th:if="${suggest.status} == '0'">
+    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+        <legend>回复</legend>
+    </fieldset>
+
+    <div class="layui-form-item layui-form-text">
+        <label class="layui-form-label">回复</label>
+        <div class="layui-input-block">
+            <textarea class="layui-textarea" id="reply-1" name="reply"></textarea>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn layui-btn-normal" id="LAY-component-form-setval" th:onclick="reply()">回复</button>
+        </div>
+    </div>
+</div>
+
+
+<script src="/res/admin/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+<script src="/res/admin/js/common.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript" src="/js/jquery.min.js"></script>
+<script>
+    function reply() {
+        var layer = layui.layer;
+        layer.confirm("确定要回复此内容吗？", {
+            btn: ['确定', '取消'] //可以无限个按钮
+        }, function(index, layero){
+            var suggest ={};
+            var reply = $("#reply-1").val();
+            suggest["reply"] = reply;
+            suggest["suggestId"] = [[${suggest.suggestId}]];
+            $.ajax({
+                url: "/admin/suggest/reply",
+                type: "POST",
+                async : false,
+                dataType:"json",
+                contentType : 'application/json',
+                data: JSON.stringify(suggest),
+                success: function (data) {
+                    layer.close(index);
+
+                },
+                error: function (e) {
+
+                }
+            });
+
+        }, function(index){
+            layer.close(index);
+        });
+    }
+</script>
+</body>
+</html>

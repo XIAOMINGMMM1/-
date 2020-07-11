@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.wtu.sj.mapper.LeaveMapper">
+
+    <select id="selectByUserId" resultType="cn.wtu.sj.entity.Leave" parameterType="java.lang.Integer">
+
+        SELECT
+            l.leaveId,
+            l.userId,
+            l.leaveMessage,
+            l.leaveUserId,
+            l.createTime,
+            u.userName
+        FROM
+            `leave` as l
+        left join `user` as u on l.leaveUserId = u.id
+        WHERE
+            userId = #{userId,jdbcType=INTEGER}
+        ORDER BY
+            createTime DESC
+
+    </select>
+
+
+
+    <delete id="deleteByLeaveId" parameterType="Integer">
+        DELETE FROM  `leave`
+        WHERE
+        leaveId = #{leaveId,jdbcType=INTEGER}
+    </delete>
+
+    <insert id="save" parameterType="cn.wtu.sj.entity.Leave">
+        <selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="leaveId">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO
+        `leave`(
+        userId,
+        leaveMessage,
+        leaveUserId,
+        createTime
+        )
+        VALUES
+        (#{userId},#{leaveMessage},#{leaveUserId},#{createTime})
+    </insert>
+
+
+    <select id="selectByLeaveId" resultType="cn.wtu.sj.entity.Leave" parameterType="java.lang.Integer">
+
+        SELECT
+            leaveId,
+            userId,
+            leaveMessage,
+            leaveUserId,
+            createTime
+        FROM
+            `leave`
+        WHERE
+            leaveId = #{leaveId,jdbcType=INTEGER}
+
+    </select>
+</mapper>

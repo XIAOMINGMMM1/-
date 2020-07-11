@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.wtu.sj.mapper.EssayMapper">
+
+
+    <insert id="insertOne" parameterType="cn.wtu.sj.entity.Essay">
+        <selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="essayId">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO
+        essay(userId,title,images,info,createTime)
+        VALUES
+        (#{userId},#{title},#{images},#{info},#{createTime})
+    </insert>
+
+
+
+    <select id="selectByUserId" parameterType="java.lang.Integer" resultType="cn.wtu.sj.entity.Essay">
+        SELECT
+            e.essayId,
+            e.userId,
+            e.title,
+            e.images,
+            e.info,
+            e.createTime,
+            e.updateTime,
+            e.like,
+            e.commentNum,
+            u.userName
+        FROM
+            `essay` e
+        LEFT JOIN `user` u ON e.userId = u.id
+        WHERE
+            e.userId = #{userId,jdbcType=INTEGER}
+        ORDER BY
+            e.createTime DESC
+
+    </select>
+
+
+    <delete id="deleteByEssayId" parameterType="Integer">
+        DELETE FROM `essay`
+        WHERE
+        essayId = #{essayId,jdbcType=INTEGER}
+    </delete>
+
+    <update id="updateLikeByEssayId" parameterType="cn.wtu.sj.entity.Essay">
+        UPDATE `essay` SET essay.like = #{like}
+        WHERE essay.essayId = #{essayId,jdbcType=INTEGER}
+    </update>
+
+    <select id="selectByEssayId" parameterType="Integer" resultType="cn.wtu.sj.entity.Essay">
+         SELECT
+            e.essayId,
+            e.userId,
+            e.title,
+            e.images,
+            e.info,
+            e.createTime,
+            e.updateTime,
+            e.like,
+            e.commentNum,
+            u.userName,
+            e.reportNum
+        FROM
+            `essay` e
+        LEFT JOIN `user` u ON e.userId = u.id
+        WHERE
+            e.essayId = #{essayId,jdbcType=INTEGER}
+    </select>
+
+
+
+
+    <select id="selectAll" parameterType="java.lang.Integer" resultType="cn.wtu.sj.entity.Essay">
+        SELECT
+            e.essayId,
+            e.userId,
+            e.title,
+            e.images,
+            e.info,
+            e.createTime,
+            e.updateTime,
+            e.like,
+            e.commentNum,
+            u.userName
+        FROM
+            `essay` e
+        LEFT JOIN `user` u ON e.userId = u.id
+        ORDER BY
+            e.createTime DESC
+
+    </select>
+
+    <select id="select" parameterType="cn.wtu.sj.api.dto.EssayDTO" resultType="cn.wtu.sj.entity.Essay">
+        SELECT
+            e.essayId,
+            e.userId,
+            e.title,
+            e.images,
+            e.info,
+            e.createTime,
+            e.updateTime,
+            e.like,
+            e.commentNum,
+            e.reportNum,
+            u.userName
+        FROM
+            `essay` e
+        LEFT JOIN `user` u ON e.userId = u.id
+        where
+            1=1
+        <if test="userName != null and userName != ''">
+            and
+            u.userName like CONCAT(CONCAT('%',#{userName}),'%')
+        </if>
+
+        <if test="content != null and content != ''">
+            and
+            e.info like CONCAT(CONCAT('%',#{content}),'%')
+        </if>
+        ORDER BY
+            e.createTime DESC
+
+    </select>
+
+    <update id="updateReportByEssayId" parameterType="cn.wtu.sj.entity.Essay">
+        UPDATE `essay` SET essay.reportNum = #{reportNum}
+        WHERE essay.essayId = #{essayId,jdbcType=INTEGER}
+    </update>
+
+
+    <select id="selectSort" parameterType="cn.wtu.sj.api.dto.EssayDTO" resultType="cn.wtu.sj.entity.Essay">
+        SELECT
+        e.essayId,
+        e.userId,
+        e.title,
+        e.images,
+        e.info,
+        e.createTime,
+        e.updateTime,
+        (select count(*) from  `like` l where l.essayId = e.essayId) AS liked,
+        e.commentNum,
+        e.reportNum,
+        u.userName
+        FROM
+        `essay` e
+        LEFT JOIN `user` u ON e.userId = u.id
+        where
+        1=1
+        <if test="userName != null and userName != ''">
+            and
+            u.userName like CONCAT(CONCAT('%',#{userName}),'%')
+        </if>
+
+        <if test="content != null and content != ''">
+            and
+            e.info like CONCAT(CONCAT('%',#{content}),'%')
+        </if>
+        ORDER BY
+        liked DESC
+
+    </select>
+</mapper>

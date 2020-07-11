@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>账号管理</title>
+    <link rel="stylesheet" href="/res/admin/layui/css/layui.css" media="all">
+</head>
+<body>
+<div class="layui-tab" style="margin: 0;">
+    <ul class="layui-tab-title">
+        <li><a href="/admin/essay_list.html">文章列表</a></li>
+        <li class="layui-this">文章详情</li>
+    </ul>
+</div>
+
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+    <legend>文章详情</legend>
+</fieldset>
+
+<div style="padding: 20px; background-color: #F2F2F2;">
+    <form class="layui-form" action="">
+
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">用户名</label>
+                <div class="layui-input-inline">
+                    <input type="tel" disabled="disabled" name="userName" lay-verify="title" autocomplete="off"
+                           th:value="${essay.userName}" class="layui-input">
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">标题</label>
+                <div class="layui-input-inline">
+                    <input type="tel" disabled="disabled" name="title" lay-verify="title" autocomplete="off"
+                           th:value="${essay.title}" class="layui-input">
+                </div>
+            </div>
+        </div>
+
+
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">内容</label>
+            <div class="layui-input-block">
+                <textarea class="layui-textarea" disabled="disabled">[[${essay.content}]]</textarea>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">创建时间</label>
+                <div class="layui-input-inline">
+                    <input type="tel" disabled="disabled" name="createDate" lay-verify="title" autocomplete="off"
+                           th:value="${essay.createDate}" class="layui-input">
+                </div>
+            </div>
+        </div>
+
+        <label class="layui-form-label">图片：</label>
+        <div class="content whisper-content">
+            <div class="cont">
+                <div class="whisper-list">
+                    <div class="item-box">
+                        <div class="img-box">
+
+                            <img th:each="image,imageStat : ${essay.images}" th:src="${image}" th:width="300px"
+                                 th:height="200px">
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+</form>
+
+</div>
+
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+    <legend>操作</legend>
+</fieldset>
+
+<div class="layui-form-item">
+    <div class="layui-input-block">
+        <button type="button" class="layui-btn layui-btn-normal" id="LAY-component-form-setval" th:onclick="|deleteEssay(${essay.essayId})|">删除</button>
+    </div>
+</div>
+
+<link type="text/css" href="/css/style.css" rel="stylesheet"/>
+
+<script src="/res/admin/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+<script src="/res/admin/js/common.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript" src="/js/jquery.min.js"></script>
+<script>
+    function deleteEssay(essayId) {
+        var layer = layui.layer;
+        layer.confirm("确定要删除此文章吗？", {
+            btn: ['确定', '取消'] //可以无限个按钮
+        }, function (index, layero) {
+            $.ajax({
+                url: "/ordinary/essay/delete-essay?essayId=" + essayId,
+                type: "GET",
+                async: false,
+                success: function (data) {
+                    layer.close(index);
+                    window.location.href = "/admin/essay_list.html";
+                },
+                error: function (e) {
+
+                }
+            });
+
+
+        }, function (index) {
+            layer.close(index);
+        });
+    }
+</script>
+</body>
+</html>

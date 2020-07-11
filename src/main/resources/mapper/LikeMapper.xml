@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.wtu.sj.mapper.LikeMapper">
+    <insert id="insert" parameterType="cn.wtu.sj.entity.Like">
+        <selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="likeId">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO
+        `like`(
+       userId,
+       essayId
+        )
+        VALUES
+        (#{userId},#{essayId})
+    </insert>
+
+    <select id="selectByEssayId" resultType="cn.wtu.sj.entity.Like" parameterType="Integer">
+        SELECT
+        l.likeId,
+        l.essayId,
+        l.userId
+        FROM
+        `like` l
+        where
+        l.essayId = #{essayId,jdbcType=INTEGER}
+
+    </select>
+
+
+    <delete id="deleteByLikeId" parameterType="Integer">
+        DELETE FROM  `like`
+        WHERE
+        likeId = #{likeId,jdbcType=INTEGER}
+    </delete>
+
+    <delete id="deleteByEssayId" parameterType="Integer">
+        DELETE FROM  `like`
+        WHERE
+        essayId = #{essayId,jdbcType=INTEGER}
+    </delete>
+
+    <select id="selectByEssayIdAndUserId" resultType="cn.wtu.sj.entity.Like" parameterType="Integer">
+        SELECT
+        l.likeId,
+        l.essayId,
+        l.userId
+        FROM
+        `like` l
+        where
+        l.essayId = #{essayId,jdbcType=INTEGER}
+        and
+        l.userId = #{userId,jdbcType=INTEGER}
+
+    </select>
+
+</mapper>

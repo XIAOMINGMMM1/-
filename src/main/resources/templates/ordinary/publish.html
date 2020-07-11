@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>发表文章</title>
+	<meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0" name="viewport"/>
+	<meta content="yes" name="apple-mobile-web-app-capable"/>
+	<meta content="black" name="apple-mobile-web-app-status-bar-style"/>
+	<meta content="telephone=no" name="format-detection"/>
+	<link rel="stylesheet" type="text/css" href="/themes/css/base.css">
+	<link rel="stylesheet" type="text/css" href="/themes/css/home.css">
+
+
+    <link rel="stylesheet" type="text/css" href="/res/layui/css/layui.css">
+    <link rel="stylesheet" type="text/css" href="/res/css/main.css">
+
+</head>
+<body>
+
+
+<section class="aui-flexView">
+    <div class="header">
+        <div class="menu-btn">
+            <div class="menu"></div>
+        </div>
+        <h1 class="logo">
+            <a>
+                <span>校园交流平台</span>
+                <img style="height: 80px;width: 80px" src="/res/img/wtuLogo.jpg">
+            </a>
+        </h1>
+        <div class="nav">
+            <a href="/public/index.html">首页</a>
+            <a  href="/public/all_home.html">主页</a>
+            <a th:if="${user.userName != null }" class="active" href="/ordinary/publish.html">发表文章</a>
+            <!--  登陆的情况下才显示    -->
+            <a th:if="${user.userName != null }" th:href="'/public/about.html?visitUserName='+${user.userName}">我的个人中心</a>
+            <a th:if="${user.userName != null }" onclick="linkSuggest()">意见箱   <span class="layui-badge">[[${suggestCount}]]</span></a>
+        </div>
+        <p th:if="${user.userName == null }" class="welcome-text">
+            欢迎来到<span class="name">wtu校园交流平台</span> <span><a style="color: seagreen"
+                                                             href="/public/login.html">请登陆</a></span>
+        </p>
+        <p th:if="${user.userName != null }" class="welcome-text">
+            欢迎 <span><a style="color: seagreen" th:href="'/public/about.html?visitUserName='+${user.userName}">[[${user.userName}]]</a></span>
+            来到wtu校园交流平台！ <span><a style="color: seagreen" href="/logout">退出</a></span>
+        </p>
+    </div>
+
+    <section class="aui-scrollView">
+		<div class="aui-title-main">
+			<h2>类容标题</h2>
+		</div>
+		<div class='aui-textarea-wrapper'>
+			<div class='textarea-block'>
+				<textarea class="textarea-item" id="textarea-title" name="title" placeholder="请输入类容标题" maxlength="100" spellcheck="false"></textarea>
+				<div class="aui-textarea-count">
+					<span class="textareaInput">0</span>
+					/<span class="textareaTotal">100</span>
+				</div>
+			</div>
+		</div>
+		<div class="aui-title-main">
+			<h2>
+				上传图片 <em>最多上传9张图片</em>
+			</h2>
+		</div>
+		<div class="aui-upload-box">
+			<div class="aui-upload-pic">
+                <span id="chose_pic_btn" style="">
+                    <input type="file" accept="image/*"/>
+                </span>
+			</div>
+		</div>
+        <div class="aui-title-main">
+            <h2>类容</h2>
+        </div>
+        <div class='aui-textarea-wrapper'>
+            <div class='textarea-block'>
+                <textarea class="textarea-item" id="textarea-content" name="content" placeholder="请输入类容，最多500字" maxlength="500" spellcheck="false"></textarea>
+                <div class="aui-textarea-count">
+                    <span class="textareaInput">0</span>
+                    /<span class="textareaTotal">500</span>
+                </div>
+            </div>
+        </div>
+		<div class="aui-main-button">
+			<button id="attachmentUploadBtn3">提交</button>
+		</div>
+	</section>
+</section>
+</body>
+<script type="text/javascript" src="/themes/js/jquery.min.js"></script>
+<script src="/themes/js/localImg.js"></script>
+<script src="/themes/js/mobileImg.js"></script>
+<script src="/res/layui/layui.all.js" type="text/javascript" charset="utf-8"></script>
+<script th:inline="javascript">
+	$(document).ready(function() {
+		var lenInput = $('.textarea-item').val().length;
+		$(".textarea-item").keyup(function() {
+			lenInput = $(this).val().length;
+			if (lenInput > 0 && lenInput <= 300) {
+				$('.textareaInput').html(lenInput);
+				$('.textarea-btn').attr('disabled', false);
+			} else {
+				$('.textarea-btn').attr('disabled', true);
+			}
+		});
+	});
+	//字数限制500字
+
+	var picArr = new Array();
+	$('input:file').localResizeIMG({
+		width: 800,
+		quality: 1,
+		// 图片压缩 默认1 不压缩
+		success: function(result) {
+			var img = new Image();
+			img.src = result.base64;
+			var _str = "<span class='pic_look' style='background-image: url(" + img.src + ")'><em id='delete_pic'></em></span>"
+			$('#chose_pic_btn').before(_str);
+			var _i = picArr.length;
+			picArr[_i] = result.base64;
+           // picArr[_i] = img;
+			console.log(picArr);
+		}
+	});
+	// 删除图片默认显示
+	$(document).on('click', '#delete_pic', function(event) {
+		var aa = $(this).parents(".pic_look").index();
+		picArr.splice(aa, 1);
+		$(this).parents(".pic_look").remove();
+		console.log(picArr);
+	});
+
+    $("#attachmentUploadBtn3").click(function () {
+        var json = {};
+        var upFile = picArr.join("--");
+        //获取标题类容
+        var title = $("#textarea-title").val();
+        //获取类容
+        var content = $("#textarea-content").val();
+
+        json['upFile'] = upFile;
+        json['title'] = title;
+        json['content'] = content;
+        //执行上传
+        var layer = layui.layer;
+        layer.confirm("确定要发布此文章吗?", {
+            btn: ['确定', '取消'] //可以无限个按钮
+        },function (index, layero) {
+            $.ajax({
+                url: "/ordinary/essay/upload",
+                type: "POST",
+                dataType:"json",
+                data: {'title':title,'upFile':upFile,'content':content},
+                success: function (data) {
+                    window.location.href = "/public/essay.html?visitUserName="+[[${user.userName}]];
+                },
+                error: function (e) {
+                    layer.alert("发布失败；请联系管理员");
+                }
+            });
+        }, function (index) {
+        });
+
+    });
+</script>
+</html>

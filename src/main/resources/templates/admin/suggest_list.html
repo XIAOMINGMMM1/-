@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>意见管理</title>
+    <link rel="stylesheet" href="/res/admin/layui/css/layui.css" media="all">
+</head>
+<body>
+<div class="layui-form" id="table-list">
+    <br>
+    <form class="layui-form">
+      <div class="layui-form-item" style="margin-left: 20px">
+          <div class="layui-inline">
+              <label class="layui-form-label">意见内容</label>
+              <div class="layui-input-inline">
+                  <input type="text" name="contentLike" id="content-like" placeholder="请输入要搜索意见内容" autocomplete="off" class="layui-input">
+              </div>
+          </div>
+
+          <div class="layui-inline">
+              <label class="layui-form-label">状态</label>
+              <div class="layui-input-inline">
+                  <select id="status-like" name="statusLike" lay-verify="required" lay-search="">
+                      <option value=" ">直接选择</option>
+                      <option value="0">未处理</option>
+                      <option value="1">已回复</option>
+                      <option value="2">回复已收到</option>
+                  </select>
+              </div>
+          </div>
+
+            <button class="layui-btn layui-btn-normal" lay-submit="search" onclick="search()">搜索</button>
+        </div>
+    </form>
+    <table class="layui-table" lay-even lay-skin="nob">
+        <thead>
+        <tr>
+            <th class="hidden-xs">意见ID</th>
+            <th class="hidden-xs">用户名</th>
+            <th>真实名称</th>
+            <th>意见内容</th>
+            <th class="hidden-xs">状态</th>
+            <th class="hidden-xs">回复</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="suggest,suggestStat : ${suggestPageInfo.list}">
+            <td class="hidden-xs">[[${suggest.suggestId}]]</td>
+            <td class="hidden-xs">[[${suggest.userName}]]</td>
+            <td class="hidden-xs">[[${suggest.realName}]]</td>
+            <td class="hidden-xs">[[${suggest.content}]]</td>
+            <td class="hidden-xs">
+                <button class="layui-btn layui-btn-mini layui-btn-normal" th:if="${suggest.status == '1' }">已回复</button>
+                <button class="layui-btn layui-btn-mini layui-btn-normal" th:if="${suggest.status == '0' }">未处理</button>
+                <button class="layui-btn layui-btn-mini layui-btn-normal" th:if="${suggest.status == '2' }">回复已收到</button>
+            </td>
+            <td class="hidden-xs">[[${suggest.reply}]]</td>
+            <td>
+                <div class="layui-inline">
+                    <button class="layui-btn layui-btn-mini layui-btn-normal" data-url="/admin/suggest_detail.html" th:onclick="|linkSuggestDetail(${suggest.suggestId})|">查看</button>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="page" id="Page1"></div>
+    <link type="text/css" href="/css/style.css" rel="stylesheet" />
+    <script src="/res/admin/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/res/admin/js/common.js" type="text/javascript" charset="utf-8"></script>
+
+
+    <script type="text/javascript" src="/js/MyPage.js"></script>
+    <script type="text/javascript" src="/js/jquery.min.js"></script>
+    <script th:inline="javascript">
+        var flag = false;
+        var userTotal= [[${suggestPageInfo.total}]]+'';
+        var userPageNum = [[${suggestPageInfo.pageNum}]]+'';
+        $("#content-like").val([[${contentLike}]]);
+        $("#status-like").val([[${statusLike}]]);
+        P.initMathod({
+            params: {elemId: '#Page1',total:userTotal,pageSize:'10',pageIndex:userPageNum},
+            requestFunction: function () {
+                if (flag){
+                    var contentLike = $("#content-like").val();
+                    var status1 = $("#status-like").val();
+                    window.location.href = "/admin/suggest_list.html?pageNum="+P.config.pageIndex+"&contentLike="+contentLike+"&statusLike="+status1;
+
+                }
+                flag = true;
+            }
+        });
+
+        function search() {
+            var contentLike = $("#content-like").val();
+            var statusLike = $("#status-like").val();
+            window.location.href = "/admin/suggest_list.html?pageNum="+P.config.pageIndex+"&contentLike="+contentLike+"&statusLike="+statusLike;
+        }
+
+
+        function linkSuggestDetail(id) {
+            window.location.href = "/admin/suggest_detail.html?suggestId="+id;
+        }
+
+    </script>
+</div>
+</body>
+</html>

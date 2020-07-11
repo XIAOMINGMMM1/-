@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.wtu.sj.mapper.UserMapper">
+
+
+    <select id="selectByUserName" parameterType="String" resultType="cn.wtu.sj.entity.User">
+    SELECT
+        u.id,
+        u.userName,
+        u.passWord,
+        u.realName,
+        u.roles,
+        u.enable,
+        ul.nickname,
+        ul.phone,
+        ul.email,
+        ul.intro
+
+    FROM
+        `user` AS u
+    LEFT JOIN `user_info` AS ul ON ul.userId = u.id
+
+    WHERE
+     u.userName=#{userName}
+    AND u.enable = '1'
+</select>
+
+    <insert id="save" parameterType="cn.wtu.sj.entity.User">
+        <selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="id">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO
+        `user`(
+        userName,
+        passWord,
+        realName,
+        roles,
+        enable
+        )
+        VALUES
+        (#{userName},#{passWord},#{realName},#{roles},#{enable})
+    </insert>
+
+    <update id="updatePasswordById" parameterType="cn.wtu.sj.entity.User">
+        UPDATE `user` SET user.passWord = #{passWord}
+        WHERE user.id = #{id,jdbcType=INTEGER}
+    </update>
+
+
+    <select id="selectAll" resultType="cn.wtu.sj.entity.User" parameterType="java.lang.String">
+        SELECT
+        u.*,
+        ul.*
+
+        FROM
+        `user` AS u
+        LEFT JOIN `user_info` AS ul ON ul.userId = u.id
+        <if test="userName != null and userName != ''">
+            where
+            u.userName like CONCAT(CONCAT('%',#{userName}),'%')
+        </if>
+    </select>
+
+
+    <update id="updateEnableById" parameterType="cn.wtu.sj.entity.User">
+        UPDATE `user` SET user.enable = #{enable}
+        WHERE user.id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="/res/layui/css/layui.css">
+    <link rel="stylesheet" type="text/css" href="/res/css/main.css">
+    <!--加载meta IE兼容文件-->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div class="header">
+    <div class="menu-btn">
+        <div class="menu"></div>
+    </div>
+    <h1 class="logo">
+        <a>
+            <span>校园交流平台</span>
+            <img width="80px" height="80px" src="/res/img/wtuLogo.jpg">
+        </a>
+    </h1>
+    <div class="nav">
+        <a href="/public/index.html">首页</a>
+        <a href="/public/all_home.html">主页</a>
+        <a th:if="${user.userName != null }" href="/ordinary/publish.html">发表文章</a>
+        <a th:if="${user.userName != null }" class="active"
+           th:href="'/public/homePage.html?visitUserName='+${user.userName}">个人主页</a>
+        <!--  登陆的情况下才显示    -->
+        <a th:if="${user.userName != null }" th:href="'/public/about.html?visitUserName='+${user.userName}">个人中心</a>
+    </div>
+    <p th:if="${user.userName == null }" class="welcome-text">
+        欢迎来到<span class="name">wtu校园交流平台</span> <span><a style="color: seagreen"
+                                                         href="/public/login.html">请登陆</a></span>
+    </p>
+    <p th:if="${user.userName != null }" class="welcome-text">
+        欢迎 <span><a style="color: seagreen" th:href="'/public/about.html?visitUserName='+${user.userName}">[[${user.userName}]]</a></span>
+        来到wtu校园交流平台！ <span><a style="color: seagreen" href="/logout">退出</a></span>
+    </p>
+
+</div>
+
+<div class="content whisper-content" style="margin-top: 60px">
+    <div class="cont">
+        <div class="whisper-list">
+            <div class="item-box" th:each="essay,essayStat : ${essayDTOPageInfo.list}">
+                <div class="item">
+                    <p align="center"><a style="color: seagreen" th:onclick="|commentForward(${essay.essayId})|">[[${essay.title}]]</a>
+                    </p>
+                    <div style="margin-top: 20px">
+                    <span style="float: left">
+                        <a style="color: seagreen" th:href="'/public/about.html?visitUserName='+${essay.userName}">[[${essay.userName}]]</a>
+                    </span>
+                        <span style="float: right">
+                        <i class="layui-icon layui-icon-date"></i>[[${essay.createDate}]]
+                    </span>
+                    </div>
+                    <br>
+                    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px">
+                        <legend><font style="font-size: 15px">内容</font></legend>
+                    </fieldset>
+
+                    <div style="margin-top: 10px">
+                        <p>
+                            [[${essay.content}]]
+                        </p>
+                    </div>
+                    <br>
+                    <div class="img-box" th:if="${essay.images !=null && essay.images.get(0) != ''}">
+
+                        <img th:each="image,imageStat : ${essay.images}" th:src="${image}" th:width="300px"
+                             th:height="200px">
+
+                    </div>
+                    <div class="op-list">
+                        <p class="like" th:id="'p-like-'+${essay.essayId}"><i
+                                class="layui-icon layui-icon-praise"></i><span th:id="'like'+${essay.essayId}"
+                                                                               th:onclick="|onclickLike(${essay.essayId},${essay.like})|">[[${essay.like}]]</span>
+                        </p>
+                        <p class="edit"><i class="layui-icon layui-icon-reply-fill"></i><span
+                                th:onclick="|commentForward(${essay.essayId})|">[[${essay.commentNum}]]</span></p>
+
+                        <br>
+                        <span style="float: right">
+                             <button type="button"
+                                     class="layui-btn layui-btn-xs" th:if="${user.id} == ${essay.userId}"
+                                     th:onclick="|deleteEssay(${essay.essayId})|">删除
+                            </button>
+                            &nbsp;
+                            <button type="button"
+                                    class="layui-btn layui-btn-xs" th:if="${user.id} != null"
+                                    th:onclick="|report(${essay.essayId})|"> !
+                            </button>
+                        </span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="page" id="Page1"></div>
+<link type="text/css" href="/css/style.css" rel="stylesheet"/>
+<script type="text/javascript" src="/js/MyPage.js"></script>
+<script type="text/javascript" src="/js/jquery.min.js"></script>
+<script th:inline="javascript">
+    var flag = false;
+    var essayTotal = [[${essayDTOPageInfo.total}]] + '';
+    var essayPageNum = [[${essayDTOPageInfo.pageNum}]] + '';
+    var essayPageSize = [[${essayDTOPageInfo.pageSize}]] + '';
+    debugger;
+    P.initMathod({
+        params: {elemId: '#Page1', total: essayTotal, pageSize: '10', pageIndex: essayPageNum},
+        requestFunction: function () {
+
+            console.log(JSON.stringify(P.config));
+            if (flag) {
+                window.location.href = "/public/homePage.html?pageNum=" + P.config.pageIndex + "&visitUserName=" + [[${visitUser.userName}]];
+
+            }
+            flag = true;
+        }
+    });
+</script>
+
+<script src="/res/layui/layui.all.js" type="text/javascript" charset="utf-8"></script>
+<script th:inline="javascript">
+    var likeMap = {};
+    var essayPageInfo = [[${essayDTOPageInfo.list}]];
+    for (var i = 0; i < essayPageInfo.length; i++) {
+        var essay = essayPageInfo[i];
+        var eId = essay["essayId"];
+        var likeFlag = essay["likeFlag"];
+        likeMap[eId] = likeFlag;
+
+    }
+
+    for (var key in likeMap) {
+        if (likeMap[key] == "true") {
+            $("#p-like-" + key).css("color", "#5FB878");
+        } else {
+            $("#p-like-" + key).css("color", "rgb(153, 153, 153)");
+        }
+
+    }
+
+
+    //点赞
+    function onclickLike(essayId, like) {
+        if (likeMap[essayId] == "false") {
+            likeMap[essayId] = "true";
+            var s = $("#like" + essayId).html();
+            $("#like" + essayId).html(parseInt(s) + 1);
+            var col = $("#p-like-" + essayId).css("color");
+            console.log(col);
+            $("#p-like-" + essayId).css("color", "#5FB878");
+
+            $.ajax({
+                url: "/ordinary/essay/onclick-like?essayId=" + essayId + "&flag=add",
+                type: "GET",
+                async: false,
+                success: function (data) {
+                    console.log(data);
+                },
+                error: function (e) {
+
+                }
+            });
+
+        } else {
+            likeMap[essayId] = "false";
+            var s = $("#like" + essayId).html();
+            $("#like" + essayId).html(parseInt(s) - 1);
+            $("#p-like-" + essayId).css("color", "rgb(153, 153, 153)");
+
+
+            $.ajax({
+                url: "/ordinary/essay/onclick-like?essayId=" + essayId + "&flag=minus",
+                type: "GET",
+                async: false,
+                success: function (data) {
+                    console.log(data);
+                },
+                error: function (e) {
+
+                }
+            });
+
+
+        }
+
+
+    }
+
+
+    //评论查看 跳转到详情页面
+    function commentForward(essayId) {
+        window.open("/public/essay_details.html?essayId=" + essayId + "&visitUserName=" + [[${visitUser.userName}]]);
+    }
+
+    //删除当前说说
+    function deleteEssay(essayId) {
+        var layer = layui.layer;
+        layer.confirm("确定要删除此文章吗?", {
+            btn: ['确定', '取消'] //可以无限个按钮
+        },function (index, layero) {
+            $.ajax({
+                url: "/ordinary/essay/delete-essay?essayId=" + essayId,
+                type: "GET",
+                async: false,
+                success: function (data) {
+                    layer.alert("删除成功！");
+                    location.reload(true);
+                },
+                error: function (e) {
+
+                }
+            });
+
+
+
+        }, function (index) {
+        });
+    }
+</script>
+
+<script th:inline="javascript">
+    function report(essayId) {
+
+        var layer = layui.layer;
+        layer.confirm("确定要举报此文章吗?", {
+            btn: ['确定', '取消'] //可以无限个按钮
+        },function (index, layero) {
+            $.ajax({
+                url: "/ordinary/essay/report?essayId=" + essayId,
+                type: "GET",
+                async: false,
+                success: function (data) {
+                    layer.alert("举报成功，我们会尽快查看并处理");
+
+                },
+                error: function (e) {
+
+                }
+            });
+
+
+        }, function (index) {
+        });
+    }
+
+    function serach() {
+        var contentLike = $("#content-like").val();
+        window.location.href = "/public/all_home.html?contentLike="+contentLike;
+    }
+</script>
+</body>
+</html>

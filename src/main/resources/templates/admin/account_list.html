@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>账号管理</title>
+    <link rel="stylesheet" href="/res/admin/layui/css/layui.css" media="all">
+</head>
+<body>
+<div class="layui-form" id="table-list">
+    <br>
+    <form class="layui-form">
+      <div class="layui-form-item" style="margin-left: 20px">
+            <div class="layui-inline">
+                <input type="text" name="userNameLike" id="user-name-like" required lay-verify="required" placeholder="请输入要搜索的用户" autocomplete="off" class="layui-input">
+            </div>
+            <button class="layui-btn layui-btn-normal" lay-submit="search" onclick="search()">搜索</button>
+        </div>
+    </form>
+    <table class="layui-table" lay-even lay-skin="nob">
+        <thead>
+        <tr>
+            <th><input type="checkbox" name="" lay-skin="primary" lay-filter="allChoose"></th>
+            <th class="hidden-xs">ID</th>
+            <th class="hidden-xs">用户名</th>
+            <th>真实名称</th>
+            <th class="hidden-xs">是否开启</th>
+            <th class="hidden-xs">电话</th>
+            <th>邮箱</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="user,userStat : ${userPageInfo.list}">
+            <td><input type="checkbox" name="" lay-skin="primary" data-id="1"></td>
+            <td class="hidden-xs" th:id="'user-id-'+${user.id}">[[${user.id}]]</td>
+            <td class="hidden-xs">[[${user.userName}]]</td>
+            <td class="hidden-xs">[[${user.realName}]]</td>
+            <td class="hidden-xs" th:id="'user-enable-'+${user.id}">
+                <button class="layui-btn layui-btn-mini layui-btn-normal" th:if="${user.enable == '1' }">已开启</button>
+                <button class="layui-btn layui-btn-mini layui-btn-normal" th:if="${user.enable == '0' }">已关闭</button>
+            </td>
+            <td class="hidden-xs">[[${user.phone}]]</td>
+            <td class="hidden-xs">[[${user.email}]]</td>
+            <td>
+                <div class="layui-inline">
+                    <button class="layui-btn layui-btn-mini layui-btn-normal" th:onclick="|resetPassword(${user.id})|">重置密码</button>
+                    <button class="layui-btn layui-btn-mini layui-btn-normal" th:if="${user.enable == '1' }" th:onclick="|modifEanble(${user.id})|">禁用</button>
+                    <button class="layui-btn layui-btn-mini layui-btn-normal" th:if="${user.enable == '0' }" th:onclick="|modifEanble(${user.id})|">启用</button>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="page" id="Page1"></div>
+    <link type="text/css" href="/css/style.css" rel="stylesheet" />
+    <script src="/res/admin/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/res/admin/js/common.js" type="text/javascript" charset="utf-8"></script>
+
+
+    <script type="text/javascript" src="/js/MyPage.js"></script>
+    <script type="text/javascript" src="/js/jquery.min.js"></script>
+    <script th:inline="javascript">
+        var flag = false;
+        var userTotal= [[${userPageInfo.total}]]+'';
+        var userPageNum = [[${userPageInfo.pageNum}]]+'';
+        $("#user-name-like").val([[${userNameLike}]]);
+        P.initMathod({
+            params: {elemId: '#Page1',total:userTotal,pageSize:'10',pageIndex:userPageNum},
+            requestFunction: function () {
+                if (flag){
+                    var userNameLike = $("#user-name-like").val();
+                    window.location.href = "/admin/account_list.html?pageNum="+P.config.pageIndex+"&userNameLike="+userNameLike;
+
+                }
+                flag = true;
+            }
+        });
+
+        function search() {
+            var userNameLike1 = $("#user-name-like").val();
+            window.location.href = "/admin/account_list.html?userNameLike="+userNameLike1;
+        }
+
+        function resetPassword(userId) {
+            var layer = layui.layer;
+            layer.confirm('确定要重置密码吗？', {
+                btn: ['确定', '取消'] //可以无限个按钮
+            }, function(index, layero){
+                $.ajax({
+                    url: "/admin/user/reset-password?id="+userId,
+                    type: "GET",
+                    async : false,
+                    success: function (data) {
+                        layer.close(index);
+                        location.reload(true);
+
+                    },
+                    error: function (e) {
+
+                    }
+                });
+
+            }, function(index){
+                layer.close(index);
+            });
+        }
+
+        function modifEanble(id) {
+            var layer = layui.layer;
+            var msg="";
+            var enable = $("#user-enable-"+id).html();
+            if ('1'==enable){
+                msg = "确定要禁用吗？";
+                enable = '0';
+            }else {
+                msg = "确定要开启吗？";
+                enable = '1';
+            }
+            layer.confirm(msg, {
+                btn: ['确定', '取消'] //可以无限个按钮
+            }, function(index, layero){
+                $.ajax({
+                    url: "/admin/user/modif-enable?id="+id+"&enable="+enable,
+                    type: "GET",
+                    async : false,
+                    success: function (data) {
+                        layer.close(index);
+                        location.reload(true);
+
+                    },
+                    error: function (e) {
+
+                    }
+                });
+
+            }, function(index){
+                layer.close(index);
+            });
+        }
+    </script>
+</div>
+</body>
+</html>

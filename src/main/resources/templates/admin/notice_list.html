@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>公告管理</title>
+    <link rel="stylesheet" href="/res/admin/layui/css/layui.css" media="all">
+</head>
+<body>
+<div class="layui-form" id="table-list">
+    <br>
+
+    <table class="layui-table" lay-even lay-skin="nob">
+        <thead>
+        <tr>
+            <th class="hidden-xs">公告id</th>
+            <th class="hidden-xs" width="800px">公告标题</th>
+            <th width="200px">公告序列</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="notice,noticeStat : ${noticeList}">
+            <td class="hidden-xs">[[${notice.noticeId}]]</td>
+            <td class="hidden-xs">[[${notice.title}]]</td>
+            <td class="hidden-xs"><input type="number" autocomplete="off" th:id="'rank-'+${notice.noticeId}" th:value="${notice.rank}" class="layui-input">
+            </td>
+            <td>
+                <div class="layui-inline">
+                    <button class="layui-btn layui-btn-mini layui-btn-normal" th:onclick="|save(${notice.noticeId})|">保存</button>
+                    <button class="layui-btn layui-btn-mini layui-btn-normal" th:onclick="|visit(${notice.noticeId})|">预览</button>
+                    <button class="layui-btn layui-btn-mini layui-btn-normal" th:onclick="|update(${notice.noticeId})|">修改</button>
+                    <button class="layui-btn layui-btn-mini layui-btn-normal" th:onclick="|del(${notice.noticeId})|">删除</button>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="page" id="Page1"></div>
+    <link type="text/css" href="/css/style.css" rel="stylesheet"/>
+    <script src="/res/admin/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/res/admin/js/common.js" type="text/javascript" charset="utf-8"></script>
+
+
+    <script type="text/javascript" src="/js/MyPage.js"></script>
+    <script type="text/javascript" src="/js/jquery.min.js"></script>
+    <script th:inline="javascript">
+        function save(noticeId) {
+            var rank = $("#rank-"+noticeId).val();
+            var notice = {};
+            notice["noticeId"]=noticeId;
+            notice["rank"]=rank;
+            var layer = layui.layer;
+            layer.confirm("确定修改此排序号吗?", {
+                btn: ['确定', '取消'] //可以无限个按钮
+            },function (index, layero) {
+                $.ajax({
+                    url: "/admin/notice/update-index",
+                    type: "POST",
+                    async : false,
+                    dataType:"json",
+                    contentType : 'application/json',
+                    data: JSON.stringify(notice),
+                    success: function (data) {
+                        layer.alert("修改排序号成功！");
+                        location.reload();
+                    },
+                    error: function (e) {
+
+                    }
+                });
+
+            }, function (index) {
+            });
+
+        }
+
+        function visit(noticeId) {
+           // window.location.href ="/admin/visit_notice.html?noticeId="+noticeId;
+            window.open("/public/visit_notice.html?noticeId="+noticeId);
+        }
+
+        function update(noticeId) {
+            window.location.href ="/admin/update_notice.html?noticeId="+noticeId;
+
+        }
+
+        function del(noticeId){
+            var layer = layui.layer;
+            layer.confirm("确定要删除此公告吗?", {
+                btn: ['确定', '取消'] //可以无限个按钮
+            },function (index, layero) {
+                $.ajax({
+                    url: "/admin/notice/delete?noticeId="+noticeId,
+                    type: "GET",
+                    async : false,
+                    success: function (data) {
+
+                        layer.confirm("删除成功！", {
+                            btn: ['确定'] //可以无限个按钮
+                        },function (index, layero) {
+                            location.reload();
+                        });
+
+                    },
+                    error: function (e) {
+
+                    }
+                });
+
+            }, function (index) {
+            });
+
+        }
+    </script>
+</div>
+</body>
+</html>

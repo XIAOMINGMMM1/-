@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.wtu.sj.mapper.SuggestMapper">
+
+    <insert id="save" parameterType="cn.wtu.sj.entity.Suggest">
+        <selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="suggestId">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO
+        `suggest`(
+        userId,
+        content,
+        createTime
+        )
+        VALUES
+        (#{userId},#{content},#{createTime})
+    </insert>
+
+    <update id="update" parameterType="cn.wtu.sj.entity.Suggest">
+        UPDATE `suggest` SET suggest.reply = #{reply},suggest.status = #{status}
+        WHERE suggest.suggestId = #{suggestId,jdbcType=INTEGER}
+    </update>
+
+    <select id="selectById" parameterType="Integer" resultType="cn.wtu.sj.entity.Suggest">
+        select
+         *
+        from
+        `suggest` s
+        where
+        s.suggestId = #{suggestId,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectByContentAndStatus" parameterType="cn.wtu.sj.entity.Suggest"
+            resultType="cn.wtu.sj.entity.Suggest">
+        select
+        s.suggestId,
+        s.userId,
+        s.content,
+        s.createTime,
+        s.reply,
+        s.status,
+        u.userName,
+        u.realName,
+        ui.phone,
+        ui.email
+        from
+        `suggest` AS s
+        left join `user` AS u on s.userId = u.id
+        left join `user_info` AS ui on ui.userId = u.id
+        where
+        1=1
+        <if test="content != null and content != ''">
+            and
+            s.content like CONCAT(CONCAT('%',#{content}),'%')
+        </if>
+
+        <if test="status != null and status != ''">
+            and
+            s.status =#{status}
+        </if>
+        <if test="suggestId != null and suggestId != ''">
+            and
+            s.suggestId =#{suggestId}
+        </if>
+    </select>
+
+    <select id="select" parameterType="cn.wtu.sj.entity.Suggest"
+            resultType="cn.wtu.sj.entity.Suggest">
+         select
+        s.suggestId,
+        s.userId,
+        s.content,
+        s.createTime,
+        s.reply,
+        s.status
+        from
+        `suggest` AS s
+        where
+        s.status = '1'
+        and
+        s.userId =#{userId}
+        union
+         select
+        s.suggestId,
+        s.userId,
+        s.content,
+        s.createTime,
+        s.reply,
+        s.status
+        from
+        `suggest` AS s
+        where
+        s.status = '0'
+        and
+        s.userId =#{userId}
+        union
+         select
+        s.suggestId,
+        s.userId,
+        s.content,
+        s.createTime,
+        s.reply,
+        s.status
+        from
+        `suggest` AS s
+        where
+        s.status = '2'
+        and
+        s.userId =#{userId}
+
+    </select>
+
+
+    <select id="selectStatusOne" parameterType="cn.wtu.sj.entity.Suggest"
+            resultType="Integer">
+         select
+       count(1)
+        from
+        `suggest` AS s
+        where
+        s.status = '1'
+        and
+        s.userId =#{userId}
+    </select>
+</mapper>

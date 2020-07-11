@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+    <meta charset="UTF-8">
+    <title>注册</title>
+
+
+    <link rel="stylesheet" href="/register/css/style.css">
+
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h2>注册用户</h2>
+    </div>
+    <form id="form" class="form">
+        <div class="form-control">
+            <label for="username">用户名</label>
+            <input type="text" placeholder="用户名" id="username" />
+            <i class="fas fa-check-circle"></i>
+            <i class="fas fa-exclamation-circle"></i>
+            <small>Error message</small>
+        </div>
+<!--        <div class="form-control">-->
+<!--            <label for="username">邮箱</label>-->
+<!--            <input type="email" placeholder="请输有效入邮箱" id="email" />-->
+<!--            <i class="fas fa-check-circle"></i>-->
+<!--            <i class="fas fa-exclamation-circle"></i>-->
+<!--            <small>Error message</small>-->
+<!--        </div>-->
+        <div class="form-control">
+            <label for="username">昵称</label>
+            <input type="text" placeholder="昵称" id="nickname" />
+            <i class="fas fa-check-circle"></i>
+            <i class="fas fa-exclamation-circle"></i>
+            <small>Error message</small>
+        </div>
+        <div class="form-control">
+            <label for="username">真实名称</label>
+            <input type="test" placeholder="真实名称" required=true id="realname"/>
+            <i class="fas fa-check-circle"></i>
+            <i class="fas fa-exclamation-circle"></i>
+            <small>Error message</small>
+        </div>
+        <div class="form-control">
+            <label for="username">密码</label>
+            <input type="password" placeholder="密码" id="password"/>
+            <i class="fas fa-check-circle"></i>
+            <i class="fas fa-exclamation-circle"></i>
+            <small>Error message</small>
+        </div>
+        <div class="form-control">
+            <label for="username">确认密码</label>
+            <input type="password" placeholder="确认密码" id="password2"/>
+            <i class="fas fa-check-circle"></i>
+            <i class="fas fa-exclamation-circle"></i>
+            <small>Error message</small>
+        </div>
+        <button>提交</button>
+    </form>
+</div>
+<script type="text/javascript" src="/js/jquery.min.js"></script>
+<script src="/register/js/script.js"></script>
+
+
+<script>
+    // $("#realname").mouseleave(function () {
+    //     var realname = $("#realname").val();
+    //     if (realname === ''){
+    //         setErrorFor(realname, '真实姓名必须填');
+    //     }
+    // });
+    $("#username").mouseleave(function(){
+        var userName = $("#username").val();
+        if(userName.length<3|| userName.length>14){
+            setErrorFor(username, '用户名长度错误');
+            return;
+        }
+        var patt=/^[a-zA-z0-9]{3,14}$/;
+        let test = patt.test(userName);
+
+        if (!test){
+            setErrorFor(username, '用户名格式错误');
+            return;
+        }
+        $.ajax({
+            url: "/public/user/exist-username?userName="+userName,
+            type: "GET",
+            async : false,
+            success: function (data) {
+                if (data == "false"){
+                    setErrorFor(username, '用户名不能为空,或用户名已经纯在');
+                }else {
+                    setSuccessFor(username);
+                }
+            },
+            error: function (e) {
+
+            }
+        });
+        //setErrorFor(username, '用户名不能为空,或用户名已经纯在');
+    });
+
+
+
+
+</script>
+
+</body>
+</html>

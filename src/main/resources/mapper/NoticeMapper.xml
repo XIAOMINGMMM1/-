@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.wtu.sj.mapper.NoticeMapper">
+
+    <update id="update" parameterType="cn.wtu.sj.entity.Notice">
+        UPDATE `notice` SET notice.rank = #{rank},notice.title = #{title},notice.content = #{content},notice.images = #{images}
+        WHERE notice.noticeId = #{noticeId,jdbcType=INTEGER}
+    </update>
+
+    <select id="selectById" parameterType="java.lang.Integer" resultType="cn.wtu.sj.entity.Notice">
+        select
+        *
+        from
+        `notice`
+        where
+        notice.noticeId = #{noticeId,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectAll" resultType="cn.wtu.sj.entity.Notice">
+       SELECT
+        n.noticeId,
+        n.rank,
+        n.content,
+        n.images,
+        n.title
+        FROM
+	notice AS n
+        order by
+        n.rank ASC
+    </select>
+
+    <insert id="save" parameterType="cn.wtu.sj.entity.Notice">
+        <selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="noticeId">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO
+        `notice`(
+        title,
+        content,
+        images,
+        `rank`)
+        VALUES
+        (#{title},#{content},#{images},#{rank,jdbcType=INTEGER})
+    </insert>
+
+    <delete id="delete" parameterType="Integer">
+        delete from `notice`
+        where
+        noticeId=#{noticeId,jdbcType=INTEGER}
+    </delete>
+</mapper>
